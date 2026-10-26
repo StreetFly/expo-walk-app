@@ -31,6 +31,7 @@ async function schedulePushNotification() {
 
 async function schedulePauseNotification() {
   await Notifications.scheduleNotificationAsync({
+    identifier: 'pause-notification',
     content: {
       title: "Walk Paused",
       body: 'Your walk is still paused. Open the app when you are ready to continue.',
@@ -40,10 +41,6 @@ async function schedulePauseNotification() {
       seconds: 10,
     },
   });
-}
-
-async function dismissNotificationAsync(notificationIdentifier: string) {
-  await Notifications.dismissNotificationAsync(notificationIdentifier);
 }
 
 export default function WalkScreen() {
@@ -178,7 +175,7 @@ export default function WalkScreen() {
         <Button
           title="Resume Walk"
           onPress={async () => {
-            await dismissNotificationAsync(notification?.request.identifier || '');
+            await Notifications.cancelScheduledNotificationAsync('pause-notification');
           }}
         />
       </View>
