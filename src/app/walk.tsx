@@ -28,6 +28,23 @@ async function schedulePushNotification() {
   });
 }
 
+async function schedulePauseNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Walk Paused",
+      body: 'Your walk is still paused. Open the app when you are ready to continue.',
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 10,
+    },
+  });
+}
+
+async function dismissNotificationAsync(notificationIdentifier: string) {
+  await Notifications.dismissNotificationAsync(notificationIdentifier);
+}
+
 export default function WalkScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -148,6 +165,19 @@ export default function WalkScreen() {
           title="Press to schedule a notification"
           onPress={async () => {
             await schedulePushNotification();
+          }}
+        />
+        <Button
+          title="Press to schedule a pause notification"
+          onPress={async () => {
+            await schedulePauseNotification();
+            <text>Pause notification scheduled</text>
+          }}
+        />
+        <Button
+          title="Resume Walk"
+          onPress={async () => {
+            await dismissNotificationAsync(notification?.request.identifier || '');
           }}
         />
       </View>
