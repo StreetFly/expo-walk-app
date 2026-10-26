@@ -6,7 +6,7 @@ import { Button, Platform, StyleSheet, View } from 'react-native';
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
-const requestPermissions = async () => {
+const requestPermissions = async (onPermissionGranted?: () => void) => {
   const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
   console.log('foregroundStatus', foregroundStatus);
 
@@ -25,6 +25,7 @@ const requestPermissions = async () => {
     }
   );
 
+  onPermissionGranted?.();
   return;
   } else { 
     if (foregroundStatus === 'granted') {
@@ -38,11 +39,18 @@ const requestPermissions = async () => {
     }
     }
   }
+  onPermissionGranted?.();
 };
 
-const PermissionsButton = ({ title }: { title: string | null }) => (
+const PermissionsButton = ({
+  title,
+  onPermissionGranted,
+}: {
+  title: string | null;
+  onPermissionGranted?: () => void;
+}) => (
   <View style={styles.container}>
-    <Button onPress={requestPermissions}
+    <Button onPress={() => requestPermissions(onPermissionGranted)}
      title={
       title !== null && title !== undefined
       ? title

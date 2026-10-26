@@ -43,6 +43,20 @@ async function schedulePauseNotification() {
   });
 }
 
+async function scheduleGoalNotification() {
+  await Notifications.scheduleNotificationAsync({
+    identifier: 'goal-notification',
+    content: {
+      title: "Goal Reached!",
+      body: 'Great job! You completed your walking goal.',
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 2,
+    },
+  });
+}
+
 export default function WalkScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -52,6 +66,28 @@ export default function WalkScreen() {
   const [notification, setNotification] = useState<Notifications.Notification | undefined>(
     undefined
   );
+
+  const [seconds, setSeconds] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const goalSeconds = 60;
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+
+    if (isActive && seconds < goalSeconds) {
+      interval = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000);
+    } else if (seconds >= goalSeconds) {
+      setIsActive(false);
+      scheduleGoalNotification();
+      alert('Walking goal reached!');
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isActive, seconds]);
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -165,21 +201,42 @@ export default function WalkScreen() {
             await schedulePushNotification();
           }}
         />
-        <Button
-          title="Press to schedule a pause notification"
-          onPress={async () => {
-            await schedulePauseNotification();
-            <text>Pause notification scheduled</text>
-          }}
-        />
-        <Button
-          title="Resume Walk"
-          onPress={async () => {
-            await Notifications.cancelScheduledNotificationAsync('pause-notification');
-          }}
-        />
       </View>
-      <PermissionsButton title="Start Walk" />
+      <Button
+        title="Pause Walk"
+        onPress={async () => {
+          await schedulePauseNotification();
+          setIsActive(false);
+          alert('Pause reminder scheduled.');
+        }}
+      />
+      <Button
+        title="Resume Walk"
+        onPress={async () => {
+          await Notifications.cancelScheduledNotificationAsync('pause-notification');
+          setIsActive(true);
+          alert('Pause reminder canceled.')
+        }}
+      />
+      <Button
+        title="Stop Walk"
+        onPress={async () => {
+          await Notifications.cancelScheduledNotificationAsync('pause-notification');
+          setIsActive(false);
+          setSeconds(0);
+          alert('Pause reminder canceled.');
+        }}
+      />
+      <Button
+        title="Test Start Walk"
+        onPress={async () => {
+          setIsActive(true);
+        }}
+      />
+      <Text style={{ color: 'white' }}>
+        Goal: {goalSeconds} seconds | Progress: {seconds} seconds
+      </Text>
+      <PermissionsButton title="Start Walk" onPermissionGranted={() => setIsActive(true)} />
     </View>
   );
 }
@@ -194,5 +251,5 @@ const styles = StyleSheet.create({
   paragraph: {
     fontSize: 18,
     textAlign: 'center',
-  },
+  }
 });
