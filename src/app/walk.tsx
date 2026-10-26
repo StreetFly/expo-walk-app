@@ -1,7 +1,8 @@
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
-import { useEffect, useState } from 'react';
+import { AndroidImportance } from 'expo-notifications';
+import React, { useEffect, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import PermissionsButton from '../components/permissions-button';
 
@@ -97,7 +98,7 @@ export default function WalkScreen() {
       if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('myNotificationChannel', {
           name: 'A channel is needed for the permissions prompt to appear',
-          importance: Notifications.AndroidImportance.MAX,
+          importance: AndroidImportance.MAX,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#FF231F7C',
         });
@@ -150,7 +151,7 @@ export default function WalkScreen() {
     <View style={styles.container}>
       <Text style={styles.paragraph}>The app collects latitude, longitude, date, and time.
         Location data is collected only while a walk is being tracked.
-        Location records are stored locally on the user's device.</Text>
+        Location records are stored locally on the user&apos;s device.</Text>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text>Your expo push token: {expoPushToken}</Text>
         <Text>{`Channels: ${JSON.stringify(
