@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { AndroidImportance } from 'expo-notifications';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import PermissionsButton from '../components/permissions-button';
 
@@ -70,6 +70,7 @@ export default function WalkScreen() {
   const [seconds, setSeconds] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const goalSeconds = 60;
+  const hasSentGoalNotification = useRef(false);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
@@ -80,8 +81,11 @@ export default function WalkScreen() {
       }, 1000);
     } else if (seconds >= goalSeconds) {
       setIsActive(false);
-      scheduleGoalNotification();
-      alert('Walking goal reached!');
+      if (!hasSentGoalNotification.current) {
+        hasSentGoalNotification.current = true;
+        scheduleGoalNotification();
+        alert('Walking goal reached!');
+      }
     }
 
     return () => {
@@ -230,6 +234,8 @@ export default function WalkScreen() {
       <Button
         title="Test Start Walk"
         onPress={async () => {
+          setSeconds(0);
+          hasSentGoalNotification.current = false;
           setIsActive(true);
         }}
       />
