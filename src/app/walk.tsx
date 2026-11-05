@@ -5,6 +5,7 @@ import { AndroidImportance } from 'expo-notifications';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import PermissionsButton from '../components/permissions-button';
+import WalkMaps from '../components/walk-maps';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -243,6 +244,7 @@ export default function WalkScreen() {
         Goal: {goalSeconds} seconds | Progress: {seconds} seconds
       </Text>
       <PermissionsButton title="Start Walk" onPermissionGranted={() => setIsActive(true)} />
+      <WalkMaps />
     </View>
   );
 }
