@@ -1,4 +1,5 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import React from 'react';
 import { useColorScheme } from 'react-native';
 
 import { Colors } from '@/constants/theme';
@@ -32,6 +33,12 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Label>Walk</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="figure.walk" />
       </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="walk-details">
+        <NativeTabs.Trigger.Label>Walk Details</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="figure.walk" />
+      </NativeTabs.Trigger>
+
     </NativeTabs>
   );
 }

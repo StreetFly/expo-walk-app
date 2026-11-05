@@ -1,5 +1,5 @@
 import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Button, Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
@@ -9,7 +9,7 @@ import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import * as Linking from 'expo-linking';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React from 'react';
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -31,17 +31,18 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
-  const url = Linking.useLinkingURL();
 
-  if (url) {
-    const { hostname, path, queryParams } = Linking.parse(url);
 
-    console.log(
-      `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
-        queryParams
-      )}`
-    );
-  }
+
+  const openWalk = (id: string) => {
+    router.push({
+      pathname: '/walk-details',
+      params: { id },
+    });
+  };
+
+  const url = Linking.createURL('/walk');
+  console.log('Walk URL:', url);
 
   return (
     <ThemedView style={styles.container}>
@@ -70,6 +71,22 @@ export default function HomeScreen() {
           <Link href="/walk">
             <ThemedText>Walk Page</ThemedText>
           </Link>
+
+          <Button
+            title="Walk 101"
+            onPress={() => openWalk('101')}
+          />
+
+          <Button
+            title="Walk 102"
+            onPress={() => openWalk('102')}
+          />
+
+          <Button
+            title="Walk 103"
+            onPress={() => openWalk('103')}
+          />
+
         </ThemedView>
 
         {Platform.OS === 'web' && <WebBadge />}
