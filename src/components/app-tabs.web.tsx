@@ -15,6 +15,7 @@ import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
+import React from 'react';
 
 export default function AppTabs() {
   return (
@@ -30,6 +31,9 @@ export default function AppTabs() {
           </TabTrigger>
           <TabTrigger name="walk" href="/walk" asChild>
             <TabButton>Walk</TabButton>
+          </TabTrigger>
+          <TabTrigger name="walk-details" href="/walk-details" asChild>
+            <TabButton>Walk Details</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>
