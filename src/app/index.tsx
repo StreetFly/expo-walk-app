@@ -11,6 +11,8 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import * as Linking from 'expo-linking';
 import { Link, router } from 'expo-router';
 import React from 'react';
+
+
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
     return <ThemedText type="small">use browser devtools</ThemedText>;
@@ -32,7 +34,17 @@ function getDevMenuHint() {
 
 export default function HomeScreen() {
 
+  const url = Linking.useLinkingURL();
 
+  if (url) {
+    const { hostname, path, queryParams } = Linking.parse(url);
+
+    console.log(
+      `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
+        queryParams
+      )}`
+    );
+  }
 
   const openWalk = (id: string) => {
     router.push({
@@ -40,9 +52,6 @@ export default function HomeScreen() {
       params: { id },
     });
   };
-
-  const url = Linking.createURL('/walk');
-  console.log('Walk URL:', url);
 
   return (
     <ThemedView style={styles.container}>
