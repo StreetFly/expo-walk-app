@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import PermissionsButton from '../components/permissions-button';
 import WalkMaps from '../components/walk-maps';
+import { Link } from '../../.expo/types/router';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -190,6 +191,9 @@ export default function WalkScreen() {
       <Text style={styles.paragraph}>The app collects latitude, longitude, date, and time.
         Location data is collected only while a walk is being tracked.
         Location records are stored locally on the user&apos;s device.</Text>
+      <Link href="/walk-notes">
+        <Text>Walk Notes</Text>
+      </Link>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <Text>Your expo push token: {expoPushToken}</Text>
         <Text>{`Channels: ${JSON.stringify(
