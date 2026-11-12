@@ -1,66 +1,102 @@
-import React, { useEffect, useState } from 'react';
 import { ThemedText } from '@/components/themed-text';
-import MapView from 'react-native-maps';
-import { StyleSheet, View } from 'react-native';
+import { ThemedView } from '@/components/themed-view';
 import * as Location from 'expo-location';
-
-
+import React, { useEffect, useState } from 'react';
+import { Button, StyleSheet } from 'react-native';
+import MapView, { type Region } from 'react-native-maps';
 
 export default function WalkMaps() {
-    const [region, setRegion] = useState({
-        latitude: 0,
-        longitude: 0,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-    });
+    const [statusMessage, setStatusMessage] = useState<string | null>(null);
+    const [region, setRegion] = useState<Region | null>(null);
+    const [isTracking, setIsTracking] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        async function getCurrentLocation() {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') return;
-
-            const location = await Location.getCurrentPositionAsync({});
-            setRegion({
-                ...region,
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
+        if (!isTracking) {
+            return;
         }
 
-        getCurrentLocation();
-    }, []);
+        let isActive = true;
+        let subscription: Location.LocationSubscription | null = null;
 
-    useEffect(() => {
         async function trackLocation() {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') return;
-
-            const subscription = await Location.watchPositionAsync(
-                { accuracy: Location.Accuracy.High, timeInterval: 1000 },
-                (location) => {
-                    setRegion({
-                        ...region,
-                        latitude: location.coords.latitude,
-                        longitude: location.coords.longitude,
-                    });
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    if (isActive) {
+                        setErrorMessage('Permission to access location was denied.');
+                        setIsTracking(false);
+                    }
+                    return;
                 }
-            );
 
-            return () => subscription.remove();
+                const initialLocation = await Location.getCurrentPositionAsync({});
+                if (!isActive) {
+                    return;
+                }
+
+                setErrorMessage(null);
+                setRegion((currentRegion) => ({
+                    latitude: initialLocation.coords.latitude,
+                    longitude: initialLocation.coords.longitude,
+                    latitudeDelta: currentRegion?.latitudeDelta ?? 0.01,
+                    longitudeDelta: currentRegion?.longitudeDelta ?? 0.01,
+                }));
+
+                subscription = await Location.watchPositionAsync(
+                    { accuracy: Location.Accuracy.High, timeInterval: 1000 },
+                    (location) => {
+                        setRegion((currentRegion) => ({
+                            latitude: location.coords.latitude,
+                            longitude: location.coords.longitude,
+                            latitudeDelta: currentRegion?.latitudeDelta ?? 0.01,
+                            longitudeDelta: currentRegion?.longitudeDelta ?? 0.01,
+                        }));
+                    }
+                );
+
+                if (!isActive) {
+                    subscription.remove();
+                }
+            } catch (error) {
+                console.error('Unable to track location:', error);
+                if (isActive) {
+                    setErrorMessage('Unable to get your location. Please try again.');
+                    setIsTracking(false);
+                }
+            }
         }
 
-        trackLocation();
-    }, []);
+        void trackLocation();
+
+        return () => {
+            isActive = false;
+            subscription?.remove();
+        };
+    }, [isTracking]);
 
     return (
-        <View style={styles.container}>
-            <ThemedText>Current Latitude: {region.latitude}</ThemedText>
-            <ThemedText>Current Longitude: {region.longitude}</ThemedText>
-            <MapView
-                style={styles.map}
-                region={region}
+        <ThemedView style={styles.container}>
+            <Button
+                title={isTracking ? 'Stop Walk' : 'Start Walk'}
+                onPress={() => {
+                    setErrorMessage(null);
+                    setIsTracking((tracking) => !tracking);
+                }}
             />
-        </View>
+            {errorMessage && <ThemedText>{errorMessage}</ThemedText>}
+            {region ? (
+                <>
+                    <ThemedText>Current Latitude: {region.latitude}</ThemedText>
+                    <ThemedText>Current Longitude: {region.longitude}</ThemedText>
+                    <MapView style={styles.map} region={region} />
+                </>
+            ) : (
+                <ThemedText>
+                    {isTracking ? 'Getting your location…' : 'Start a walk to track your location.'}
+                </ThemedText>
+            )}
+        </ThemedView>
     );
 }
 
