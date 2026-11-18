@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
 import PermissionsButton from '../components/permissions-button';
 import WalkMaps from '../components/walk-maps';
-import { Link } from '../../.expo/types/router';
+import { Link } from 'expo-router';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

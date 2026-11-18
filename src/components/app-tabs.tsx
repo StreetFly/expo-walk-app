@@ -39,6 +39,11 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Icon sf="figure.walk" />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="walk-notes">
+        <NativeTabs.Trigger.Label>Walk Notes</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="note.text" />
+      </NativeTabs.Trigger>
+
     </NativeTabs>
   );
 }

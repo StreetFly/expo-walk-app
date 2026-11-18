@@ -96,6 +96,11 @@ export default function HomeScreen() {
             onPress={() => openWalk('103')}
           />
 
+          <Button
+            title="Walk Notes"
+            onPress={() => router.push('/walk-notes')}
+          />
+
         </ThemedView>
 
         {Platform.OS === 'web' && <WebBadge />}
